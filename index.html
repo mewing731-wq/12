@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lucky Spin</title>
+
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  color: white;
+}
+.card {
+  background: #1e1e1e;
+  padding: 30px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+}
+button {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+  border: none;
+  border-radius: 14px;
+  margin-top: 15px;
+  color: white;
+}
+#soundBtn { background: #2196f3; }
+#spinBtn { background: linear-gradient(90deg,#ff5722,#e91e63); }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>🎰 Lucky Spin</h1>
+  <p>Баланс: <span id="balance">100</span></p>
+
+  <button id="soundBtn">🔊 Включить звук</button>
+  <button id="spinBtn">Крутить</button>
+</div>
+
+<!-- АУДИО -->
+<audio id="bg" src="music.mp3" loop></audio>
+<audio id="win" src="win.mp3"></audio>
+<audio id="lose" src="lose.mp3"></audio>
+
+<script>
+let balance = 100;
+let soundOn = false;
+
+const bg = document.getElementById("bg");
+const win = document.getElementById("win");
+const lose = document.getElementById("lose");
+
+document.getElementById("soundBtn").onclick = () => {
+  bg.volume = 0.4;
+  bg.play();           // 🔥 КРИТИЧНО: напрямую в клике
+  soundOn = true;
+  navigator.vibrate?.(200);
+};
+
+document.getElementById("spinBtn").onclick = () => {
+  if (!soundOn) return;
+
+  balance -= 10;
+  document.getElementById("balance").textContent = balance;
+
+  navigator.vibrate?.(100);
+
+  if (Math.random() < 0.7) {
+    win.currentTime = 0;
+    win.play();
+    balance += 20;
+  } else {
+    lose.currentTime = 0;
+    lose.play();
+  }
+
+  document.getElementById("balance").textContent = balance;
+};
+</script>
+
+</body>
+</html>
