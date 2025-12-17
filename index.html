@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fruit Slots</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: radial-gradient(circle, #222, #000);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.game {
+    text-align: center;
+}
+
+.slots {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.reel {
+    width: 70px;
+    height: 80px;
+    border: 3px solid #fff;
+    border-radius: 10px;
+    font-size: 46px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #111;
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.reel.win {
+    border-color: #ffd700;
+    box-shadow: 0 0 20px #ffd700;
+}
+
+button {
+    padding: 12px 26px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.balance {
+    margin-top: 10px;
+    font-size: 20px;
+}
+</style>
+</head>
+
+<body>
+<div class="game">
+    <h1>🍒 Fruit Slots</h1>
+
+    <div class="slots">
+        <div class="reel" id="r1">🍒</div>
+        <div class="reel" id="r2">🍋</div>
+        <div class="reel" id="r3">🍊</div>
+    </div>
+
+    <button onclick="spin()">Крутить</button>
+
+    <div class="balance">
+        Баланс: <span id="balance">100</span>
+    </div>
+</div>
+
+<!-- Звуки -->
+<audio id="spinSound" src="spin.mp3" loop></audio>
+<audio id="winSound" src="win.mp3"></audio>
+
+<script>
+const fruits = ["🍒","🍋","🍊","🍉","🍇","🍎"];
+let balance = 100;
+let spinning = false;
+
+const reels = [
+    document.getElementById("r1"),
+    document.getElementById("r2"),
+    document.getElementById("r3")
+];
+
+const spinSound = document.getElementById("spinSound");
+spinSound.volume = 0.06; // очень тихо
+
+const winSound = document.getElementById("winSound");
+winSound.volume = 0.4;
+
+function randomFruit() {
+    return fruits[Math.floor(Math.random() * fruits.length)];
+}
+
+function spin() {
+    if (spinning || balance < 10) return;
+    spinning = true;
+
+    balance -= 10;
+    updateBalance();
+
+    reels.forEach(r => r.classList.remove("win"));
+
+    if (navigator.vibrate) navigator.vibrate(40);
+
+    spinSound.currentTime = 0;
+    spinSound.play();
+
+    let intervals = [];
+
+    reels.forEach((reel, i) => {
+        intervals[i] = setInterval(() => {
+            reel.textContent = randomFruit();
+        }, 80);
+    });
+
+    setTimeout(() => {
+        intervals.forEach(i => clearInterval(i));
+        spinSound.pause();
+
+        // ~50% шанс победы
+        const win = Math.random() < 0.5;
+        let result;
+
+        if (win) {
+            result = randomFruit();
+            reels.forEach(r => {
+                r.textContent = result;
+                r.classList.add("win");
+            });
+
+            balance += 20;
+            winSound.currentTime = 0;
+            winSound.play();
+
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        } else {
+            reels.forEach(r => r.textContent = randomFruit());
+        }
+
+        updateBalance();
+        spinning = false;
+    }, 2000);
+}
+
+function updateBalance() {
+    document.getElementById("balance").textContent = balance;
+}
+</script>
+</body>
+</html>
