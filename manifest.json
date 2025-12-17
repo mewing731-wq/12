@@ -1,0 +1,8 @@
+{
+  "name": "Lucky Spin",
+  "short_name": "Spin",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#111111"
+}
